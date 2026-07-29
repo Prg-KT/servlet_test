@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>サーバーサイドJava 後期テスト対策</title>
+
+<style>
+:root{
+    --main:#2563eb;
+    --dark:#1e3a8a;
+    --bg:#f1f5f9;
+    --card:#fff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#cbd5e1;
+    --ok:#16a34a;
+    --ng:#dc2626;
+    --warn:#f97316;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+    margin:0;
+    color:var(--text);
+    background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "Yu Gothic",Meiryo,sans-serif;
+    line-height:1.7;
+}
+button,input,select{font:inherit}
+header{
+    padding:24px 16px;
+    color:#fff;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+}
+header h1{
+    max-width:1000px;
+    margin:0 auto 5px;
+    font-size:clamp(1.5rem,6vw,2.4rem);
+}
+header p{
+    max-width:1000px;
+    margin:3px auto;
+}
+nav{
+    position:sticky;
+    top:0;
+    z-index:100;
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding:9px;
+    background:rgba(255,255,255,.97);
+    border-bottom:1px solid var(--border);
+}
+nav button{
+    flex:1;
+    min-width:95px;
+    padding:9px;
+    color:var(--dark);
+    white-space:nowrap;
+    cursor:pointer;
+    background:#dbeafe;
+    border:0;
+    border-radius:999px;
+    font-weight:bold;
+}
+nav button.active{
+    color:#fff;
+    background:var(--main);
+}
+main{
+    max-width:1000px;
+    margin:auto;
+    padding:18px 12px 70px;
+}
+.page{display:none}
+.page.active{display:block}
+.card{
+    margin-bottom:16px;
+    padding:17px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:15px;
+    box-shadow:0 7px 22px rgba(15,23,42,.07);
+}
+h2{
+    margin:8px 0 16px;
+    color:var(--dark);
+    border-bottom:3px solid var(--main);
+}
+.count-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:7px;
+}
+.count-box{
+    padding:10px 3px;
+    text-align:center;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+}
+.count-box strong{
+    display:block;
+    color:var(--dark);
+    font-size:1.2rem;
+}
+.count-box span{
+    font-size:.72rem;
+    font-weight:bold;
+}
+.toolbar{
+    position:sticky;
+    top:57px;
+    z-index:50;
+    margin-bottom:13px;
+    padding:11px;
+    background:rgba(255,255,255,.98);
+    border:1px solid var(--border);
+    border-radius:13px;
+    box-shadow:0 5px 18px rgba(15,23,42,.12);
+}
+.progress-head{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:6px;
+    color:var(--dark);
+    font-weight:bold;
+    font-size:.9rem;
+}
+.progress{
+    height:9px;
+    margin-bottom:9px;
+    overflow:hidden;
+    background:#e2e8f0;
+    border-radius:999px;
+}
+.progress-bar{
+    width:0;
+    height:100%;
+    background:linear-gradient(90deg,#2563eb,#22c55e);
+    transition:.3s;
+}
+select,.search,.answer-input{
+    width:100%;
+    min-height:49px;
+    padding:10px 12px;
+    background:#fff;
+    border:2px solid #94a3b8;
+    border-radius:10px;
+    font-size:16px;
+}
+.quiz-card{
+    min-height:400px;
+    padding:18px;
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(15,23,42,.08);
+}
+.quiz-card.correct{border-color:var(--ok)}
+.quiz-card.incorrect{border-color:var(--ng)}
+.tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.tag{
+    padding:3px 9px;
+    border-radius:999px;
+    font-size:.76rem;
+    font-weight:bold;
+}
+.num{color:#fff;background:var(--dark)}
+.type{color:#075985;background:#e0f2fe}
+.category{color:#065f46;background:#d1fae5}
+.question{
+    margin:20px 0;
+    font-size:clamp(1.08rem,4.8vw,1.35rem);
+    font-weight:bold;
+    line-height:1.85;
+}
+.blank{
+    display:inline-block;
+    min-width:110px;
+    color:#be123c;
+    text-align:center;
+    border-bottom:3px solid #be123c;
+}
+.options{
+    display:grid;
+    gap:9px;
+    margin-bottom:13px;
+}
+.option{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    min-height:54px;
+    padding:12px;
+    cursor:pointer;
+    background:#f8fafc;
+    border:2px solid #e2e8f0;
+    border-radius:11px;
+}
+.option:has(input:checked){
+    background:#eff6ff;
+    border-color:var(--main);
+}
+.option input{
+    width:21px;
+    height:21px;
+    margin-top:2px;
+    flex-shrink:0;
+}
+.code{
+    overflow-x:auto;
+    padding:14px;
+    color:#e2e8f0;
+    background:#0f172a;
+    border-radius:10px;
+    white-space:pre;
+    font:14px/1.6 Consolas,monospace;
+}
+.btn{
+    min-height:50px;
+    padding:11px;
+    color:#fff;
+    cursor:pointer;
+    background:var(--main);
+    border:0;
+    border-radius:10px;
+    font-weight:bold;
+    touch-action:manipulation;
+}
+.btn:disabled{opacity:.4}
+.check-btn{
+    width:100%;
+    margin-top:8px;
+    font-size:1rem;
+}
+.navigation,.sub-controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:10px;
+}
+.back{color:var(--dark);background:#dbeafe}
+.gray{color:#334155;background:#e2e8f0}
+.red{background:#b91c1c}
+.answer-box{
+    margin-top:16px;
+    padding:14px;
+    background:#f0fdf4;
+    border-left:5px solid var(--ok);
+    border-radius:10px;
+}
+.answer-box.ng{
+    background:#fff7ed;
+    border-left-color:var(--warn);
+}
+.answer-box h3{margin:0 0 7px}
+.correct-text{
+    margin:8px 0;
+    color:#166534;
+    font-weight:bold;
+    font-size:1.05rem;
+}
+.overview{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(58px,1fr));
+    gap:7px;
+    margin-top:15px;
+    padding:13px;
+    background:#fff;
+    border-radius:13px;
+}
+.overview button{
+    min-height:44px;
+    cursor:pointer;
+    background:#f8fafc;
+    border:2px solid var(--border);
+    border-radius:8px;
+    font-weight:bold;
+}
+.overview button.ok{
+    color:#166534;
+    background:#dcfce7;
+    border-color:#22c55e;
+}
+.overview button.ng{
+    color:#991b1b;
+    background:#fee2e2;
+    border-color:#ef4444;
+}
+.overview button.now{outline:3px solid #93c5fd}
+.hidden{display:none!important}
+.glossary-controls{
+    display:grid;
+    grid-template-columns:1fr 200px;
+    gap:8px;
+    margin-bottom:14px;
+}
+.glossary-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:12px;
+}
+.term{
+    padding:15px;
+    background:#fff;
+    border-left:6px solid var(--main);
+    border-radius:11px;
+    box-shadow:0 5px 15px rgba(15,23,42,.06);
+}
+.term h3{
+    margin:0 0 7px;
+    color:var(--dark);
+}
+.note{
+    padding:13px;
+    background:#eff6ff;
+    border-left:5px solid #3b82f6;
+    border-radius:9px;
+}
+.warning{
+    padding:13px;
+    background:#fff7ed;
+    border-left:5px solid #f97316;
+    border-radius:9px;
+}
+.scope-table{
+    width:100%;
+    border-collapse:collapse;
+}
+.scope-table th,.scope-table td{
+    padding:9px;
+    border:1px solid var(--border);
+    vertical-align:top;
+}
+.scope-table th{
+    color:#fff;
+    background:var(--dark);
+}
+footer{
+    padding:25px;
+    color:#cbd5e1;
+    text-align:center;
+    background:#0f172a;
+}
+@media(max-width:600px){
+    .count-grid{grid-template-columns:repeat(3,1fr)}
+    .glossary-controls{grid-template-columns:1fr}
+    .toolbar{top:56px}
+    .quiz-card{min-height:370px;padding:15px}
+    main{padding-left:9px;padding-right:9px}
+}
+@media print{
+    nav,.toolbar,.navigation,.sub-controls,.check-btn{display:none}
+    body{background:#fff}
+    .card,.quiz-card,.term{box-shadow:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>サーバーサイドJava 後期テスト対策</h1>
+    <p>スマホ対応・一問一答形式</p>
+    <p>Servlet／Scope／Filter／JSP／MVC／JDBC／DAO</p>
+</header>
+
+<nav>
+    <button class="active" onclick="showPage('quiz',this)">問題</button>
+    <button onclick="showPage('glossary',this)">用語集</button>
+    <button onclick="showPage('review',this)">要点</button>
+</nav>
+
+<main>
+
+<section id="quizPage" class="page active">
+    <h2>一問一答クイズ</h2>
+
+    <div class="card">
+        <div class="count-grid">
+            <div class="count-box"><strong>30</strong><span>穴埋め</span></div>
+            <div class="count-box"><strong>100</strong><span>選択</span></div>
+            <div class="count-box"><strong>30</strong><span>○×</span></div>
+            <div class="count-box"><strong>10</strong><span>コード</span></div>
+            <div class="count-box"><strong>170</strong><span>合計</span></div>
+        </div>
+        <p>回答後、「この問題を答え合わせ」を押すと、その場で正解と解説が表示されます。</p>
+    </div>
+
+    <div class="toolbar">
+        <div class="progress-head">
+            <span id="positionText">問題 1 / 170</span>
+            <span id="scoreText">正解 0問</span>
+        </div>
+        <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+
+        <select id="quizMode" onchange="changeMode()">
+            <option value="all">全170問</option>
+            <option value="fill">穴埋め30問</option>
+            <option value="mc">選択問題100問</option>
+            <option value="tf">○×問題30問</option>
+            <option value="code">コード読解10問</option>
+            <option value="unanswered">未回答だけ</option>
+            <option value="incorrect">間違えた問題だけ</option>
+        </select>
+    </div>
+
+    <div id="quizArea"></div>
+
+    <div class="navigation">
+        <button id="prevBtn" class="btn back" onclick="move(-1)">← 前へ</button>
+        <button id="nextBtn" class="btn" onclick="move(1)">次へ →</button>
+    </div>
+
+    <div class="sub-controls">
+        <button class="btn gray" onclick="toggleOverview()">問題一覧</button>
+        <button class="btn red" onclick="resetQuiz()">記録リセット</button>
+    </div>
+
+    <div id="overview" class="overview hidden"></div>
+</section>
+
+<section id="glossaryPage" class="page">
+    <h2>用語集</h2>
+
+    <div class="glossary-controls">
+        <input id="termSearch" class="search" type="search"
+               placeholder="用語を検索" oninput="renderGlossary()">
+        <select id="termCategory" onchange="renderGlossary()">
+            <option value="">全分類</option>
+        </select>
+    </div>
+
+    <div id="glossaryList" class="glossary-list"></div>
+</section>
+
+<section id="reviewPage" class="page">
+    <h2>試験直前の重要ポイント</h2>
+
+    <div class="card">
+        <h3>スコープ比較</h3>
+        <div style="overflow-x:auto">
+            <table class="scope-table">
+                <tr>
+                    <th>スコープ</th>
+                    <th>範囲</th>
+                    <th>例</th>
+                </tr>
+                <tr>
+                    <td>リクエスト</td>
+                    <td>1回のリクエスト</td>
+                    <td>エラー情報</td>
+                </tr>
+                <tr>
+                    <td>セッション</td>
+                    <td>利用者ごと</td>
+                    <td>ログインユーザー</td>
+                </tr>
+                <tr>
+                    <td>アプリケーション</td>
+                    <td>Webアプリ全体</td>
+                    <td>全員共通の投稿一覧</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>ライフサイクル</h3>
+        <p><strong>インスタンス生成 → init() → doGet()/doPost() → destroy()</strong></p>
+        <p>通常、同じサーブレットインスタンスが複数のリクエストを処理します。</p>
+    </div>
+
+    <div class="card">
+        <h3>フィルタチェーン</h3>
+        <p><strong>A前 → B前 → Servlet → B後 → A後</strong></p>
+        <p><code>chain.doFilter()</code>より前が前処理、後ろが後処理です。</p>
+    </div>
+
+    <div class="card">
+        <h3>JDBCの基本手順</h3>
+        <p>
+            接続 → SQL準備 → 値設定 → SQL実行 →
+            ResultSet処理 → クローズ
+        </p>
+    </div>
+
+    <div class="warning">
+        <strong>頻出：</strong>
+        <code>removeAttribute()</code>は属性1個を削除し、
+        <code>invalidate()</code>はセッション全体を無効化します。
+    </div>
+
+    <div class="note">
+        <strong>環境差：</strong>
+        Tomcat 9以前では<code>javax.servlet</code>、
+        Tomcat 10以降では基本的に<code>jakarta.servlet</code>です。
+    </div>
+</section>
+
+</main>
+
+<footer>サーバーサイドJava 後期テスト対策・スマホ版</footer>
+
+<script>
+/* =====================================================
+   用語データ100項目
+   分類 | 用語 | 意味
+===================================================== */
+
+const BANK_TEXT = `
+Servlet|Servlet|サーバー側でHTTPリクエストを処理するJavaプログラム
+Servlet|HttpServlet|一般的なHTTPサーブレットを作るときに継承するクラス
+Servlet|doGet()|GETリクエストを処理する代表的なメソッド
+Servlet|doPost()|POSTリクエストを処理する代表的なメソッド
+Servlet|getParameter()|フォームなどのリクエストパラメータを取得するメソッド
+Servlet|String|getParameter()が基本的に返す型
+Servlet|@WebServlet|サーブレットとURLパターンを対応付けるアノテーション
+Servlet|setContentType()|レスポンスの種類や文字コードを設定するメソッド
+Servlet|Apache Tomcat|代表的なServletコンテナ
+Servlet|Servletコンテナ|サーブレットの生成・実行・破棄を管理する実行環境
+Servlet|ServletConfig|サーブレットごとの設定情報を扱うオブジェクト
+Servlet|getInitParameter()|初期化パラメータを取得するメソッド
+Servlet|PrintWriter|レスポンス本文へ文字列を出力するためのオブジェクト
+Servlet|getContextPath()|Webアプリケーションのコンテキストパスを取得するメソッド
+Servlet|HttpServletRequest|HTTPリクエスト情報を表すオブジェクト
+Lifecycle|init()|サーブレットの初期化時に原則一度呼ばれるメソッド
+Lifecycle|destroy()|サーブレットが破棄される直前に呼ばれるメソッド
+Lifecycle|サーブレットライフサイクル|生成・初期化・リクエスト処理・破棄という流れ
+Lifecycle|リクエスト処理メソッド|doGetやdoPostなどアクセスごとに呼ばれる可能性があるメソッド
+Lifecycle|コンストラクタ|サーブレットのインスタンス生成時に実行される処理
+Lifecycle|loadOnStartup|サーブレットを起動時に読み込ませるための設定
+Lifecycle|super.init(config)|initのオーバーライド時に親クラスへ設定情報を渡す呼び出し
+Scope|リクエストスコープ|1回のリクエスト処理中だけデータを共有する範囲
+Scope|セッションスコープ|利用者ごとに複数リクエストでデータを共有する範囲
+Scope|アプリケーションスコープ|Webアプリケーション全体でデータを共有する範囲
+Scope|setAttribute()|スコープへ属性を保存するメソッド
+Scope|getAttribute()|スコープから属性を取得するメソッド
+Scope|removeAttribute()|指定した属性だけを削除するメソッド
+Session|invalidate()|セッション全体を無効化するメソッド
+Session|getSession()|HttpSessionを取得するメソッド
+Session|HttpSession|利用者ごとのセッション情報を表すオブジェクト
+Session|セッションID|ブラウザとサーバー側セッションを対応付ける識別情報
+Session|Cookie|セッションIDの送受信に一般的に使われる仕組み
+Scope|ServletContext|Webアプリケーション全体の情報を扱うオブジェクト
+Scope|リクエスト属性|リダイレクトすると基本的に引き継がれない属性
+Scope|Object型|getAttribute()が基本的に返す型
+Session|セッションタイムアウト|一定時間操作がないセッションを無効化する仕組み
+Session|isNew()|新しく作成されたセッションか確認するメソッド
+Session|setMaxInactiveInterval()|セッションの無操作時間を秒単位で設定するメソッド
+Scope|永続化|データを再起動後も残すためファイルやDBに保存すること
+Filter|Filter|サーブレットなどの前後に共通処理を適用する仕組み
+Filter|doFilter()|フィルタの中心となる処理を記述するメソッド
+Filter|FilterChain|フィルタと対象リソースの呼び出し連鎖を表すオブジェクト
+Filter|chain.doFilter()|次のフィルタまたは対象リソースを呼び出す処理
+Filter|前処理|chain.doFilterより前に実行する処理
+Filter|後処理|chain.doFilterから戻った後に実行する処理
+Filter|@WebFilter|フィルタを登録するアノテーション
+Filter|文字コードフィルタ|複数処理へ共通の文字コード設定を適用するフィルタ
+Filter|認証確認フィルタ|ログイン状態を確認してアクセスを制御するフィルタ
+Filter|逆順処理|フィルタの戻り処理が行きと逆になること
+Listener|Listener|Webアプリケーション内のイベントを監視する仕組み
+Listener|ServletContextListener|Webアプリケーションの開始と終了を監視するリスナー
+Listener|contextInitialized()|Webアプリケーション開始時に呼ばれるメソッド
+Listener|contextDestroyed()|Webアプリケーション終了時に呼ばれるメソッド
+Listener|@WebListener|リスナーを登録するアノテーション
+Thread|スレッドセーフ|複数スレッドから同時利用されても問題が起きない性質
+Thread|synchronized|Javaで排他制御を行うキーワード
+Thread|ローカル変数|メソッド内で宣言され通常はスレッドごとに分かれる変数
+Thread|インスタンスフィールド|同じサーブレットインスタンスを使う処理間で共有される変数
+Thread|競合状態|複数処理の実行順によって結果が変化する状態
+Thread|排他制御|共有データへ同時にアクセスしないよう制御すること
+Thread|ロック|同期処理で一度に一つのスレッドだけが取得する権利
+Transition|フォワード|サーバー内部で同じリクエストを引き継ぐ画面遷移
+Transition|リダイレクト|ブラウザへ新しいリクエストを送らせる画面遷移
+Transition|RequestDispatcher|フォワードやインクルードに使うオブジェクト
+Transition|forward()|RequestDispatcherでフォワードを実行するメソッド
+Transition|sendRedirect()|ブラウザへリダイレクトを指示するメソッド
+MVC|MVC|Model・View・Controllerに役割を分離する設計
+MVC|Model|データや業務処理を担当する部分
+MVC|View|画面表示を担当する部分
+MVC|Controller|入力受付・モデル呼び出し・画面遷移を担当する部分
+MVC|JavaBeans|関連するデータをまとめるために利用できるJavaクラス
+MVC|ロジックモデル|ログイン判定などアプリケーション固有の処理を担当するクラス
+MVC|カプセル化|フィールドを隠しメソッド経由で操作する考え方
+MVC|getter・setter|JavaBeansのプロパティを取得・設定するメソッド
+JSP|JSP|Javaを利用して動的なHTMLを生成する表示技術
+JSP|EL|JSPで属性やプロパティを簡潔に参照する式言語
+JSP|JSTL|条件分岐や繰り返しをタグで記述するライブラリ
+JSP|c:if|JSTLで単純な条件分岐を行うタグ
+JSP|c:choose|JSTLで複数条件分岐全体を表すタグ
+JSP|c:when|c:choose内で条件を指定するタグ
+JSP|c:otherwise|どのc:whenにも該当しない場合を処理するタグ
+JSP|c:forEach|JSTLで繰り返し処理を行うタグ
+JSP|c:out|JSTLで値を出力するタグ
+JSP|c:set|JSTLで属性や変数を設定するタグ
+JSP|c:remove|JSTLで属性を削除するタグ
+JSP|jsp:include|リクエスト時に別リソースの結果を動的に取り込むタグ
+JDBC|JDBC|Javaからデータベースを操作するためのAPI
+JDBC|Connection|データベースとの接続を表すオブジェクト
+JDBC|DriverManager|データベース接続を取得するためのクラス
+JDBC|PreparedStatement|プレースホルダを使ってSQLを実行するオブジェクト
+JDBC|ResultSet|SELECT文の検索結果を保持するオブジェクト
+JDBC|next()|ResultSetのカーソルを次の行へ進めるメソッド
+JDBC|getString()|ResultSetから文字列値を取得するメソッド
+JDBC|getInt()|ResultSetから整数値を取得するメソッド
+JDBC|executeUpdate()|INSERT・UPDATE・DELETEなどを実行するメソッド
+JDBC|executeQuery()|SELECT文を実行してResultSetを取得するメソッド
+JDBC|SQLインジェクション|入力値によって意図しないSQLを実行される攻撃
+DAO|DAO|データベースアクセス処理を分離する設計パターン
+Maven|pom.xml|Mavenの依存関係やビルド設定を記述するファイル
+`.trim();
+
+const glossary = BANK_TEXT.split("\n").map(line => {
+    const [category, term, meaning] = line.split("|");
+    return {category,term,meaning};
+});
+
+/* =====================================================
+   穴埋め30問
+===================================================== */
+
+const fillIndexes = [
+    0,2,3,5,6,10,11,15,16,22,
+    23,24,25,26,27,28,29,33,40,41,
+    42,43,50,51,56,63,76,78,90,92
+];
+
+const fillQuizzes = fillIndexes.map(index => {
+    const item=glossary[index];
+    return {
+        type:"fill",
+        label:"穴埋め",
+        category:item.category,
+        q:"次の説明に当てはまる用語を答えてください。【　】＝"+item.meaning,
+        answers:[item.term],
+        displayAnswer:item.term,
+        explanation:item.meaning
+    };
+});
+
+/* =====================================================
+   選択問題100問
+===================================================== */
+
+const selectionQuizzes = glossary.map((item,index) => {
+    const same=glossary.filter(x =>
+        x.category===item.category && x.term!==item.term
+    );
+
+    const others=glossary.filter(x => x.term!==item.term);
+    const pool=same.length>=3?same:others;
+
+    const wrong=[
+        pool[(index*3)%pool.length].term,
+        pool[(index*3+1)%pool.length].term,
+        pool[(index*3+2)%pool.length].term
+    ];
+
+    const unique=[...new Set(wrong)];
+
+    for(const candidate of others){
+        if(unique.length>=3)break;
+        if(!unique.includes(candidate.term)){
+            unique.push(candidate.term);
+        }
+    }
+
+    const position=index%4;
+    const options=unique.slice(0,3);
+    options.splice(position,0,item.term);
+
+    return {
+        type:"mc",
+        label:"選択",
+        category:item.category,
+        q:"次の説明に該当する用語を選んでください。『"+item.meaning+"』",
+        options,
+        answer:position,
+        displayAnswer:item.term,
+        explanation:item.meaning
+    };
+});
+
+/* =====================================================
+   ○×問題30問
+===================================================== */
+
+const TF_TEXT=`
+Servlet|HttpServletを継承してサーブレットを作成できる|1|一般的なHTTPサーブレットはHttpServletを継承する
+Servlet|doGetはPOSTリクエストだけを処理する|0|doGetは主にGETリクエストを処理する
+Servlet|getParameterの戻り値は基本的にString型である|1|数値として使う場合は型変換する
+Lifecycle|initは初期化時に原則一度呼ばれる|1|インスタンス生成後の初期化時に呼ばれる
+Lifecycle|destroyはリクエストのたびに呼ばれる|0|破棄直前に呼ばれる
+Lifecycle|doGetやdoPostは複数回呼ばれる可能性がある|1|アクセスごとに実行される可能性がある
+Scope|リクエストスコープはリダイレクト後も保持される|0|リダイレクトは別リクエストになる
+Scope|セッションはユーザーごとの情報保存に利用できる|1|ログイン情報などに適している
+Scope|アプリケーションスコープは全利用者から共有される|1|Webアプリ全体で共有される
+Scope|setAttributeはスコープに属性を保存する|1|属性名とオブジェクトを指定する
+Scope|getAttributeの戻り値は常にString型である|0|基本的な戻り値はObject型である
+Session|removeAttributeはセッション全体を破棄する|0|指定した属性だけを削除する
+Session|invalidateはセッション全体を無効化する|1|ログアウト処理で利用される
+Session|ブラウザを閉じるとサーバー側セッションも必ず即時削除される|0|タイムアウトまで残る場合がある
+Filter|Filterは文字コードなどの共通処理に利用できる|1|複数の処理へ共通適用できる
+Filter|chain.doFilterを呼ばなくても必ずServletへ進む|0|通常は後続処理へ進まない
+Filter|chain.doFilterより前は前処理である|1|後ろは後処理になる
+Filter|フィルタの戻り処理は行きと逆順になる|1|呼び出しが入れ子になるため
+Listener|ServletContextListenerはアプリの開始と終了を監視できる|1|開始と終了のイベントを扱う
+Thread|サーブレットのフィールドは複数スレッドで共有される可能性がある|1|同じインスタンスが再利用される
+Thread|入力値は必ずサーブレットのフィールドへ保存する|0|原則としてローカル変数などを使う
+Thread|synchronizedは同時実行の制御に利用できる|1|同じロックに対する同時実行を制限する
+Transition|フォワードは同じリクエストを引き継ぐ|1|リクエスト属性も引き継げる
+Transition|リダイレクトでは新しいリクエストが送られる|1|ブラウザが指定URLへ再アクセスする
+MVC|MVCでJSPは主にControllerを担当する|0|JSPは主にViewを担当する
+JSP|ELでJavaBeansのプロパティを参照できる|1|user.nameなどの形式で参照できる
+JSP|c:forEachは繰り返し用のJSTLタグである|1|コレクションなどを繰り返す
+JDBC|ResultSet生成直後は最初の行を指している|0|最初の行より前にあるのでnextが必要
+JDBC|入力値のSQL直接連結はSQLインジェクション対策になる|0|PreparedStatementを利用する
+DAO|DAOはデータベースアクセス処理を分離する|1|SQL実行などをまとめる
+`.trim();
+
+const trueFalseQuizzes=TF_TEXT.split("\n").map(line=>{
+    const [category,q,value,explanation]=line.split("|");
+    const yes=value==="1";
+    return{
+        type:"tf",
+        label:"○×",
+        category,
+        q,
+        options:["○","×"],
+        answer:yes?0:1,
+        displayAnswer:yes?"○":"×",
+        explanation
+    };
+});
+
+/* =====================================================
+   コード読解10問
+===================================================== */
+
+const codeQuizzes=[
+{
+type:"code",label:"コード読解",category:"Servlet",
+q:"このコードで取得しているものは何ですか。",
+code:'String name = request.getParameter("name");',
+options:["リクエストパラメータname","セッション属性name","初期化パラメータ","DBのname列"],
+answer:0,displayAnswer:"リクエストパラメータname",
+explanation:"getParameterはフォームなどから送信された値を取得します。"
+},
+{
+type:"code",label:"コード読解",category:"Scope",
+q:"保存先のスコープはどれですか。",
+code:'request.setAttribute("message", "エラーです");',
+options:["セッション","リクエスト","アプリケーション","データベース"],
+answer:1,displayAnswer:"リクエストスコープ",
+explanation:"requestにsetAttributeしているためリクエストスコープです。"
+},
+{
+type:"code",label:"コード読解",category:"Session",
+q:"このコードの結果として正しいものはどれですか。",
+code:'HttpSession session = request.getSession();\nsession.setAttribute("loginUser", user);',
+options:["DBへ保存","リクエストへ保存","セッションへ保存","セッション破棄"],
+answer:2,displayAnswer:"ログインユーザーをセッションへ保存",
+explanation:"session.setAttributeによってセッションスコープへ保存します。"
+},
+{
+type:"code",label:"コード読解",category:"Session",
+q:"このコードが行う処理はどれですか。",
+code:'HttpSession session = request.getSession();\nsession.invalidate();',
+options:["属性1個を削除","ResultSetを閉じる","新規セッション作成","セッション全体を無効化"],
+answer:3,displayAnswer:"セッション全体を無効化",
+explanation:"invalidateはログアウト処理などで利用します。"
+},
+{
+type:"code",label:"コード読解",category:"Filter",
+q:"出力順として正しいものはどれですか。",
+code:'System.out.println("A");\nchain.doFilter(request, response);\nSystem.out.println("B");',
+options:["A→後続処理→B","B→後続処理→A","A→B→後続処理","後続処理のみ"],
+answer:0,displayAnswer:"A → 後続処理 → B",
+explanation:"chain.doFilterより前が前処理、後ろが後処理です。"
+},
+{
+type:"code",label:"コード読解",category:"Transition",
+q:"このコードの画面遷移はどれですか。",
+code:'RequestDispatcher d =\n request.getRequestDispatcher("/main.jsp");\nd.forward(request, response);',
+options:["リダイレクト","フォワード","セッション破棄","DB接続"],
+answer:1,displayAnswer:"main.jspへフォワード",
+explanation:"RequestDispatcherのforwardを使っています。"
+},
+{
+type:"code",label:"コード読解",category:"Transition",
+q:"このコードを実行するとどうなりますか。",
+code:'response.sendRedirect(\n request.getContextPath() + "/Login"\n);',
+options:["同じリクエストでJSP表示","セッション破棄","Loginへ再リクエスト","ResultSet生成"],
+answer:2,displayAnswer:"ブラウザがLoginへ新しいリクエストを送る",
+explanation:"sendRedirectはブラウザに別URLへのアクセスを指示します。"
+},
+{
+type:"code",label:"コード読解",category:"JDBC",
+q:"setString(1,name)の意味はどれですか。",
+code:'String sql = "SELECT * FROM users WHERE name = ?";\nPreparedStatement ps = conn.prepareStatement(sql);\nps.setString(1, name);',
+options:["ResultSetの1行目へ移動","セッションへ保存","SQLへ直接連結","1番目の?へnameを設定"],
+answer:3,displayAnswer:"1番目のプレースホルダへnameを設定",
+explanation:"PreparedStatementの番号は1から始まります。"
+},
+{
+type:"code",label:"コード読解",category:"JDBC",
+q:"while文が繰り返される条件はどれですか。",
+code:'ResultSet rs = ps.executeQuery();\nwhile (rs.next()) {\n String name = rs.getString("name");\n}',
+options:["次の検索結果行が存在する間","セッションがある間","SQLに?がある間","Servlet終了まで"],
+answer:0,displayAnswer:"次の検索結果行が存在する間",
+explanation:"nextがtrueの間、結果を1行ずつ処理します。"
+},
+{
+type:"code",label:"コード読解",category:"JSP",
+q:"このコードの処理として正しいものはどれですか。",
+code:'<c:forEach var="item" items="${itemList}">\n <c:out value="${item.name}" />\n</c:forEach>',
+options:["DBから削除","各itemのnameを出力","セッション破棄","Servlet初期化"],
+answer:1,displayAnswer:"itemListの各要素のnameを順番に出力",
+explanation:"c:forEachで繰り返し、c:outで値を出力します。"
+}
+];
+
+const quizzes=[
+    ...fillQuizzes,
+    ...selectionQuizzes,
+    ...trueFalseQuizzes,
+    ...codeQuizzes
+];
+
+/* =====================================================
+   アプリ処理
+===================================================== */
+
+const STORAGE="serverJavaQuiz170_v1";
+let state=loadState();
+let filtered=[];
+let position=0;
+
+function initialState(){
+    return quizzes.map(()=>({
+        status:"unanswered",
+        answer:"",
+        revealed:false
+    }));
+}
+
+function loadState(){
+    try{
+        const data=JSON.parse(localStorage.getItem(STORAGE));
+        return Array.isArray(data)&&data.length===quizzes.length
+            ?data:initialState();
+    }catch(e){
+        return initialState();
+    }
+}
+
+function saveState(){
+    localStorage.setItem(STORAGE,JSON.stringify(state));
+}
+
+function normalize(value){
+    return String(value)
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/\s/g,"")
+        .replace(/[()（）@<>:・.]/g,"");
+}
+
+function updateFilter(){
+    const mode=document.getElementById("quizMode").value;
+
+    filtered=quizzes.map((q,i)=>({q,i})).filter(x=>{
+        if(["fill","mc","tf","code"].includes(mode)){
+            return x.q.type===mode;
+        }
+        if(mode==="unanswered"){
+            return state[x.i].status==="unanswered";
+        }
+        if(mode==="incorrect"){
+            return state[x.i].status==="incorrect";
+        }
+        return true;
+    }).map(x=>x.i);
+
+    if(position>=filtered.length){
+        position=Math.max(0,filtered.length-1);
+    }
+}
+
+function renderQuiz(){
+    updateFilter();
+    const area=document.getElementById("quizArea");
+
+    if(!filtered.length){
+        area.innerHTML='<div class="card">該当する問題はありません。</div>';
+        updateProgress();
+        return;
+    }
+
+    const actual=filtered[position];
+    const q=quizzes[actual];
+    const s=state[actual];
+
+    let input="";
+
+    if(q.type==="fill"){
+        input=`<input id="textAnswer" class="answer-input"
+        value="${escapeHtml(s.answer)}"
+        placeholder="答えを入力"
+        onkeydown="if(event.key==='Enter')checkAnswer()">`;
+    }else{
+        input=`<div class="options">${
+            q.options.map((o,i)=>`
+            <label class="option">
+                <input type="radio" name="choice" value="${i}"
+                ${String(s.answer)===String(i)?"checked":""}>
+                <span>${escapeHtml(o)}</span>
+            </label>`).join("")
+        }</div>`;
+    }
+
+    const code=q.code
+        ?`<pre class="code">${escapeHtml(q.code)}</pre>`:"";
+
+    const resultClass=s.status==="correct"
+        ?"correct":s.status==="incorrect"?"incorrect":"";
+
+    area.innerHTML=`
+    <article class="quiz-card ${resultClass}">
+        <div class="tags">
+            <span class="tag num">Q${actual+1}</span>
+            <span class="tag type">${q.label}</span>
+            <span class="tag category">${q.category}</span>
+        </div>
+
+        <div class="question">
+            ${formatQuestion(q.q)}
+        </div>
+
+        ${code}
+        ${input}
+
+        <button class="btn check-btn" onclick="checkAnswer()">
+            この問題を答え合わせ
+        </button>
+
+        ${s.revealed?answerBox(q,s):""}
+    </article>`;
+
+    updateProgress();
+    renderOverview();
+
+    document.getElementById("prevBtn").disabled=position===0;
+    document.getElementById("nextBtn").disabled=
+        position>=filtered.length-1;
+}
+
+function checkAnswer(){
+    if(!filtered.length)return;
+
+    const actual=filtered[position];
+    const q=quizzes[actual];
+    const s=state[actual];
+
+    if(q.type==="fill"){
+        const input=document.getElementById("textAnswer");
+        const value=input.value.trim();
+
+        if(!value){
+            alert("答えを入力してください。");
+            return;
+        }
+
+        s.answer=value;
+        s.status=q.answers.some(a=>
+            normalize(a)===normalize(value)
+        )?"correct":"incorrect";
+    }else{
+        const selected=document.querySelector(
+            'input[name="choice"]:checked'
+        );
+
+        if(!selected){
+            alert("選択肢を選んでください。");
+            return;
+        }
+
+        s.answer=selected.value;
+        s.status=Number(selected.value)===q.answer
+            ?"correct":"incorrect";
+    }
+
+    s.revealed=true;
+    saveState();
+    renderQuiz();
+
+    setTimeout(()=>{
+        document.querySelector(".answer-box")
+            ?.scrollIntoView({behavior:"smooth",block:"nearest"});
+    },50);
+}
+
+function answerBox(q,s){
+    let user="未回答";
+
+    if(q.type==="fill"){
+        user=s.answer;
+    }else if(s.answer!==""){
+        user=q.options[Number(s.answer)];
+    }
+
+    return `
+    <div class="answer-box ${s.status==="correct"?"":"ng"}">
+        <h3>${s.status==="correct"?"正解です！":"確認しましょう"}</h3>
+        <div>あなたの回答：<strong>${escapeHtml(user)}</strong></div>
+        <div class="correct-text">
+            正解：${escapeHtml(q.displayAnswer)}
+        </div>
+        <div><strong>解説：</strong>${escapeHtml(q.explanation)}</div>
+    </div>`;
+}
+
+function formatQuestion(text){
+    return escapeHtml(text).replace(
+        "【　】",
+        '<span class="blank">　　　　</span>'
+    );
+}
+
+function move(amount){
+    const next=position+amount;
+    if(next>=0&&next<filtered.length){
+        position=next;
+        renderQuiz();
+        document.querySelector(".toolbar")
+            .scrollIntoView({behavior:"smooth"});
+    }
+}
+
+function changeMode(){
+    position=0;
+    renderQuiz();
+}
+
+function updateProgress(){
+    const answered=state.filter(x=>
+        x.status!=="unanswered"
+    ).length;
+
+    const correct=state.filter(x=>
+        x.status==="correct"
+    ).length;
+
+    document.getElementById("positionText").textContent=
+        filtered.length
+        ?`問題 ${position+1} / ${filtered.length}`
+        :"対象問題なし";
+
+    document.getElementById("scoreText").textContent=
+        `正解 ${correct}・回答 ${answered}/${quizzes.length}`;
+
+    document.getElementById("progressBar").style.width=
+        `${answered/quizzes.length*100}%`;
+}
+
+function toggleOverview(){
+    document.getElementById("overview")
+        .classList.toggle("hidden");
+    renderOverview();
+}
+
+function renderOverview(){
+    const box=document.getElementById("overview");
+    if(box.classList.contains("hidden"))return;
+
+    box.innerHTML=filtered.map((actual,i)=>{
+        const s=state[actual];
+        const cls=s.status==="correct"?"ok":
+            s.status==="incorrect"?"ng":"";
+        return `<button class="${cls} ${i===position?"now":""}"
+        onclick="jump(${i})">Q${actual+1}</button>`;
+    }).join("");
+}
+
+function jump(i){
+    position=i;
+    renderQuiz();
+    document.querySelector(".toolbar")
+        .scrollIntoView({behavior:"smooth"});
+}
+
+function resetQuiz(){
+    if(!confirm("全170問の学習記録をリセットしますか？"))return;
+    state=initialState();
+    localStorage.removeItem(STORAGE);
+    position=0;
+    document.getElementById("quizMode").value="all";
+    renderQuiz();
+}
+
+/* =====================================================
+   用語集
+===================================================== */
+
+function setupGlossary(){
+    const select=document.getElementById("termCategory");
+    [...new Set(glossary.map(x=>x.category))].sort()
+        .forEach(category=>{
+            const option=document.createElement("option");
+            option.value=category;
+            option.textContent=category;
+            select.appendChild(option);
+        });
+    renderGlossary();
+}
+
+function renderGlossary(){
+    const search=document.getElementById("termSearch")
+        .value.toLowerCase();
+
+    const category=document.getElementById("termCategory")
+        .value;
+
+    const list=glossary.filter(x=>{
+        const text=(x.term+" "+x.meaning).toLowerCase();
+        return(!search||text.includes(search))&&
+              (!category||x.category===category);
+    });
+
+    document.getElementById("glossaryList").innerHTML=
+        list.map(x=>`
+        <article class="term">
+            <span class="tag category">${x.category}</span>
+            <h3>${escapeHtml(x.term)}</h3>
+            <div>${escapeHtml(x.meaning)}</div>
+        </article>`).join("");
+}
+
+/* =====================================================
+   画面切替
+===================================================== */
+
+function showPage(name,button){
+    document.querySelectorAll(".page")
+        .forEach(x=>x.classList.remove("active"));
+
+    document.querySelectorAll("nav button")
+        .forEach(x=>x.classList.remove("active"));
+
+    document.getElementById(name+"Page")
+        .classList.add("active");
+
+    button.classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function escapeHtml(value){
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+setupGlossary();
+renderQuiz();
+
+console.log({
+    fill:fillQuizzes.length,
+    selection:selectionQuizzes.length,
+    trueFalse:trueFalseQuizzes.length,
+    code:codeQuizzes.length,
+    total:quizzes.length
+});
+</script>
+
+</body>
+</html>
