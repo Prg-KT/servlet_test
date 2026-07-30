@@ -13,6 +13,10 @@
     --important: #ef4444;
     --high: #f97316;
     --normal: #3b82f6;
+    --grade-a: #15803d;
+    --grade-b: #d97706;
+    --grade-c: #dc2626;
+    --unanswered: #64748b;
 }
 
 /* ========================================
@@ -84,6 +88,20 @@ pre {
     border-radius: 10px;
     line-height: 1.55;
     -webkit-overflow-scrolling: touch;
+}
+
+button,
+select,
+input {
+    accent-color: var(--main);
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .28);
+    outline-offset: 2px;
 }
 
 /* ========================================
@@ -219,6 +237,11 @@ section {
     margin-top: 16px;
 }
 
+.small-note {
+    color: var(--muted);
+    font-size: .88rem;
+}
+
 /* ========================================
    全体像・処理フロー
 ======================================== */
@@ -249,6 +272,76 @@ section {
 }
 
 /* ========================================
+   考査6分野
+======================================== */
+
+.exam-category-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(290px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.exam-category-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.exam-category-card:nth-child(1) {
+    border-left: 5px solid #2563eb;
+}
+
+.exam-category-card:nth-child(2) {
+    border-left: 5px solid #7c3aed;
+}
+
+.exam-category-card:nth-child(3) {
+    border-left: 5px solid #0891b2;
+}
+
+.exam-category-card:nth-child(4) {
+    border-left: 5px solid #0f766e;
+}
+
+.exam-category-card:nth-child(5) {
+    border-left: 5px solid #d97706;
+}
+
+.exam-category-card:nth-child(6) {
+    border-left: 5px solid #dc2626;
+}
+
+.exam-category-card strong {
+    color: var(--main-dark);
+    font-size: 1.02rem;
+}
+
+.exam-category-card p {
+    margin: 4px 0 0;
+    color: #475569;
+    font-size: .9rem;
+    line-height: 1.6;
+}
+
+.category-number {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    color: white;
+    background: var(--main-dark);
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* ========================================
    スコープ比較表
 ======================================== */
 
@@ -257,26 +350,34 @@ section {
     -webkit-overflow-scrolling: touch;
 }
 
-.scope-table {
+.scope-table,
+.evaluation-table {
     width: 100%;
-    min-width: 820px;
     border-collapse: collapse;
     background: white;
 }
 
+.scope-table {
+    min-width: 820px;
+}
+
 .scope-table th,
-.scope-table td {
+.scope-table td,
+.evaluation-table th,
+.evaluation-table td {
     padding: 12px;
     border: 1px solid var(--border);
     vertical-align: top;
 }
 
-.scope-table th {
+.scope-table th,
+.evaluation-table th {
     color: white;
     background: var(--main-dark);
 }
 
-.scope-table tr:nth-child(even) {
+.scope-table tr:nth-child(even),
+.evaluation-table tr:nth-child(even) {
     background: #f8fafc;
 }
 
@@ -542,7 +643,23 @@ section {
     transition: width .3s ease;
 }
 
-#quizMode {
+.quiz-filter-grid {
+    display: grid;
+    grid-template-columns:
+        auto minmax(180px, 1fr)
+        auto minmax(180px, 1fr);
+    align-items: center;
+    gap: 8px 10px;
+}
+
+.quiz-filter-grid label {
+    color: var(--main-dark);
+    font-size: .86rem;
+    font-weight: bold;
+}
+
+#quizMode,
+#quizCategory {
     width: 100%;
     min-height: 48px;
     padding: 9px 12px;
@@ -553,9 +670,18 @@ section {
     font-weight: bold;
 }
 
-#quizMode:focus {
+#quizMode:focus,
+#quizCategory:focus {
     outline: 3px solid rgba(37, 99, 235, .18);
     border-color: var(--main);
+}
+
+.filtered-question-count {
+    margin: 8px 0 0;
+    color: var(--muted);
+    text-align: right;
+    font-size: .84rem;
+    font-weight: bold;
 }
 
 /* ========================================
@@ -763,7 +889,7 @@ section {
 
 .quiz-sub-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-top: 10px;
 }
@@ -771,6 +897,11 @@ section {
 .light-btn {
     color: #334155;
     background: #e2e8f0;
+}
+
+.review-btn {
+    color: white;
+    background: var(--sub);
 }
 
 .reset-btn {
@@ -886,6 +1017,269 @@ section {
 }
 
 /* ========================================
+   全体成績
+======================================== */
+
+.overall-result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.result-summary-card {
+    padding: 16px 10px;
+    text-align: center;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.result-summary-card strong {
+    display: block;
+    color: var(--main-dark);
+    font-size: 1.65rem;
+    line-height: 1.3;
+}
+
+.result-summary-card span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .85rem;
+    font-weight: bold;
+}
+
+.result-summary-card.correct {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.result-summary-card.correct strong {
+    color: var(--success);
+}
+
+.result-summary-card.incorrect {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.result-summary-card.incorrect strong {
+    color: var(--danger);
+}
+
+.result-summary-card.accuracy {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.evaluation-warning {
+    margin: 16px 0;
+    padding: 16px 18px;
+    color: #991b1b;
+    background: #fef2f2;
+    border: 2px solid #fca5a5;
+    border-left-width: 7px;
+    border-radius: 12px;
+}
+
+.evaluation-warning strong {
+    font-size: 1.08rem;
+}
+
+.evaluation-warning p {
+    margin: 5px 0 0;
+}
+
+/* ========================================
+   分野別成績
+======================================== */
+
+.domain-score-list {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(310px, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.domain-score-card {
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.domain-score-card.grade-a {
+    border-left: 6px solid var(--grade-a);
+}
+
+.domain-score-card.grade-b {
+    border-left: 6px solid var(--grade-b);
+}
+
+.domain-score-card.grade-c {
+    border-left: 6px solid var(--grade-c);
+}
+
+.domain-score-card.grade-unanswered {
+    border-left: 6px solid var(--unanswered);
+}
+
+.domain-score-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.domain-score-head h4 {
+    margin: 0;
+    color: var(--main-dark);
+    font-size: 1rem;
+}
+
+.evaluation-badge {
+    display: inline-grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    color: white;
+    background: var(--unanswered);
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.evaluation-badge.grade-a {
+    background: var(--grade-a);
+}
+
+.evaluation-badge.grade-b {
+    background: var(--grade-b);
+}
+
+.evaluation-badge.grade-c {
+    background: var(--grade-c);
+}
+
+.evaluation-badge.grade-unanswered {
+    background: var(--unanswered);
+}
+
+.domain-score-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 5px 12px;
+    margin-bottom: 8px;
+    color: #475569;
+    font-size: .86rem;
+    font-weight: bold;
+}
+
+.domain-progress {
+    width: 100%;
+    height: 11px;
+    overflow: hidden;
+    background: #e2e8f0;
+    border-radius: 999px;
+}
+
+.domain-progress-bar {
+    width: 0;
+    height: 100%;
+    background: var(--unanswered);
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+
+.domain-progress-bar.grade-a {
+    background: var(--grade-a);
+}
+
+.domain-progress-bar.grade-b {
+    background: var(--grade-b);
+}
+
+.domain-progress-bar.grade-c {
+    background: var(--grade-c);
+}
+
+.domain-progress-bar.grade-unanswered {
+    background: var(--unanswered);
+}
+
+.domain-review-button {
+    width: 100%;
+    min-height: 43px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--main-dark);
+    background: #dbeafe;
+    border: 0;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.domain-review-button:hover {
+    background: #bfdbfe;
+}
+
+/* ========================================
+   A・B・C評価表
+======================================== */
+
+.evaluation-table {
+    min-width: 620px;
+}
+
+.evaluation-a,
+.evaluation-b,
+.evaluation-c {
+    display: inline-grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: white;
+    border-radius: 50%;
+}
+
+.evaluation-a {
+    background: var(--grade-a);
+}
+
+.evaluation-b {
+    background: var(--grade-b);
+}
+
+.evaluation-c {
+    background: var(--grade-c);
+}
+
+/* ========================================
+   間違い復習
+======================================== */
+
+.review-action-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.review-status-text {
+    margin: 14px 0 0;
+    padding: 11px 13px;
+    color: #475569;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* ========================================
    フッター
 ======================================== */
 
@@ -920,6 +1314,18 @@ footer a {
 
     .flow-box {
         min-width: 120px;
+    }
+
+    .quiz-filter-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .quiz-filter-grid label {
+        grid-column: auto;
+    }
+
+    .overall-result-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -972,11 +1378,16 @@ footer a {
         grid-template-columns: 1fr;
     }
 
-    .term-list {
+    .term-list,
+    .domain-score-list {
         grid-template-columns: 1fr;
     }
 
     .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exam-category-grid {
         grid-template-columns: 1fr;
     }
 
@@ -985,7 +1396,9 @@ footer a {
     }
 
     .scope-table th,
-    .scope-table td {
+    .scope-table td,
+    .evaluation-table th,
+    .evaluation-table td {
         padding: 8px;
     }
 
@@ -995,10 +1408,22 @@ footer a {
     }
 
     .mobile-quiz-toolbar {
-        top: 58px;
+        position: static;
         margin-right: -4px;
         margin-left: -4px;
         border-radius: 11px;
+    }
+
+    .quiz-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quiz-filter-grid label {
+        margin-top: 2px;
+    }
+
+    .filtered-question-count {
+        text-align: left;
     }
 
     .single-quiz-card {
@@ -1010,8 +1435,12 @@ footer a {
         margin-top: 13px;
     }
 
-    .quiz-navigation,
+    .quiz-navigation {
+        gap: 7px;
+    }
+
     .quiz-sub-controls {
+        grid-template-columns: 1fr;
         gap: 7px;
     }
 
@@ -1031,6 +1460,10 @@ footer a {
         min-height: 43px;
         padding: 4px;
         font-size: .78rem;
+    }
+
+    .review-action-area {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1088,8 +1521,7 @@ footer a {
         gap: 2px;
     }
 
-    .quiz-navigation,
-    .quiz-sub-controls {
+    .quiz-navigation {
         grid-template-columns: 1fr 1fr;
     }
 
@@ -1110,6 +1542,51 @@ footer a {
         grid-template-columns:
             repeat(4, 1fr);
     }
+
+    .overall-result-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+    }
+
+    .result-summary-card {
+        padding: 12px 6px;
+    }
+
+    .result-summary-card strong {
+        font-size: 1.4rem;
+    }
+
+    .exam-category-card {
+        padding: 12px;
+    }
+
+    .domain-score-card {
+        padding: 13px;
+    }
+
+    .evaluation-table {
+        min-width: 560px;
+        font-size: .86rem;
+    }
+}
+
+/* ========================================
+   動きを減らす設定
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
 }
 
 /* ========================================
@@ -1122,7 +1599,9 @@ footer a {
     .quiz-navigation,
     .quiz-sub-controls,
     .check-one-btn,
-    .controls {
+    .controls,
+    .review-action-area,
+    .domain-review-button {
         display: none !important;
     }
 
@@ -1150,12 +1629,14 @@ footer a {
 
     .card,
     .term-card,
-    .single-quiz-card {
+    .single-quiz-card,
+    .domain-score-card {
         box-shadow: none;
         break-inside: avoid;
     }
 
-    .scope-table {
+    .scope-table,
+    .evaluation-table {
         min-width: 0;
     }
 
