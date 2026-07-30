@@ -21,8 +21,9 @@
         <p>授業メモ・講義スライド統合版</p>
 
         <p>
-            Servlet／Scope／Listener／Filter／
-            JSP・EL・JSTL／MVC／JDBC・DAO
+            セッション管理／ログイン認証／
+            Servlet・Listener／Filter／
+            JSP・EL・JSTL／JDBC・DAO
         </p>
 
         <div class="notice">
@@ -40,6 +41,8 @@
         <a href="#glossary">用語集</a>
         <a href="#important">最重要事項</a>
         <a href="#quiz">確認クイズ</a>
+        <a href="#results">分野別成績</a>
+        <a href="#review">間違い復習</a>
         <a href="#supplement">補足・注意</a>
     </div>
 </nav>
@@ -136,6 +139,90 @@
                 JDBCを使用したデータベース操作をまとめ、
                 ほかの処理から分離します。
             </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>今回の考査で確認する6分野</h3>
+
+        <div class="exam-category-grid">
+            <div class="exam-category-card">
+                <span class="category-number">1</span>
+
+                <div>
+                    <strong>セッション管理</strong>
+
+                    <p>
+                        HttpSession、JSESSIONID、
+                        タイムアウト、属性の保存と削除
+                    </p>
+                </div>
+            </div>
+
+            <div class="exam-category-card">
+                <span class="category-number">2</span>
+
+                <div>
+                    <strong>ログイン認証・ログアウト</strong>
+
+                    <p>
+                        認証処理、ログイン状態の保存、
+                        保護ページ、セッション破棄
+                    </p>
+                </div>
+            </div>
+
+            <div class="exam-category-card">
+                <span class="category-number">3</span>
+
+                <div>
+                    <strong>ライフサイクル・リスナー</strong>
+
+                    <p>
+                        init、service、destroy、
+                        イベント、Listener
+                    </p>
+                </div>
+            </div>
+
+            <div class="exam-category-card">
+                <span class="category-number">4</span>
+
+                <div>
+                    <strong>フィルタ</strong>
+
+                    <p>
+                        Filter、doFilter、
+                        FilterChain、前処理と後処理
+                    </p>
+                </div>
+            </div>
+
+            <div class="exam-category-card">
+                <span class="category-number">5</span>
+
+                <div>
+                    <strong>JSP・EL・JSTL</strong>
+
+                    <p>
+                        アクションタグ、EL式、
+                        暗黙オブジェクト、JSTL
+                    </p>
+                </div>
+            </div>
+
+            <div class="exam-category-card">
+                <span class="category-number">6</span>
+
+                <div>
+                    <strong>JDBC・DAO</strong>
+
+                    <p>
+                        SELECT、INSERT、UPDATE、
+                        DELETE、DAOパターン
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -239,6 +326,58 @@
             </tbody>
         </table>
     </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>セッションを取得・生成</h3>
+
+            <p>
+                <code>request.getSession()</code>
+            </p>
+
+            <p>
+                既存のセッションを取得します。
+                存在しない場合は新しいセッションを生成します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>生成せずに取得</h3>
+
+            <p>
+                <code>request.getSession(false)</code>
+            </p>
+
+            <p>
+                既存のセッションがあれば取得し、
+                存在しない場合は<code>null</code>を返します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>属性を1個削除</h3>
+
+            <p>
+                <code>session.removeAttribute("name")</code>
+            </p>
+
+            <p>
+                指定した名前の属性だけをセッションから削除します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>セッション全体を破棄</h3>
+
+            <p>
+                <code>session.invalidate()</code>
+            </p>
+
+            <p>
+                ログアウトなどで、セッション全体を無効化します。
+            </p>
+        </div>
+    </div>
 </section>
 
 <section id="glossary">
@@ -250,15 +389,20 @@
         <input
             id="termSearch"
             type="search"
-            placeholder="用語を検索：例 session、filter、JDBC">
+            placeholder="用語を検索：例 session、filter、JDBC"
+            aria-label="用語を検索">
 
-        <select id="categoryFilter">
+        <select
+            id="categoryFilter"
+            aria-label="用語の分類">
             <option value="">
                 すべての分類
             </option>
         </select>
 
-        <select id="levelFilter">
+        <select
+            id="levelFilter"
+            aria-label="用語の重要度">
             <option value="">
                 すべての重要度
             </option>
@@ -292,13 +436,40 @@
             <p>
                 <code>
                     インスタンス生成 → init() →
-                    doGet()/doPost() → destroy()
+                    service() → doGet()/doPost() → destroy()
                 </code>
             </p>
 
             <p>
-                通常、同じインスタンスが
+                <code>init()</code>は初期化時、
+                <code>service()</code>はリクエストごと、
+                <code>destroy()</code>は破棄時に呼び出されます。
+            </p>
+
+            <p>
+                通常、同じサーブレットインスタンスが
                 複数のリクエストで再利用されます。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>リスナー</h3>
+
+            <p>
+                Webアプリケーション、セッション、
+                リクエスト、属性の変化などのイベントを監視します。
+            </p>
+
+            <p>
+                代表例：
+                <code>ServletContextListener</code>、
+                <code>HttpSessionListener</code>、
+                <code>ServletRequestListener</code>
+            </p>
+
+            <p>
+                アノテーションで登録する場合は
+                <code>@WebListener</code>を使用します。
             </p>
         </div>
 
@@ -314,6 +485,11 @@
                     FilterA前 → FilterB前 → Servlet →
                     FilterB後 → FilterA後
                 </code>
+            </p>
+
+            <p>
+                <code>chain.doFilter(request, response)</code>を
+                呼び出すと、後続のフィルタやサーブレットへ進みます。
             </p>
         </div>
 
@@ -332,6 +508,44 @@
         </div>
 
         <div class="card">
+            <h3>セッション管理</h3>
+
+            <p>
+                セッション属性は
+                <code>setAttribute()</code>で保存し、
+                <code>getAttribute()</code>で取得します。
+            </p>
+
+            <p>
+                セッションIDは一般的に
+                <code>JSESSIONID</code>というCookieで管理されます。
+            </p>
+
+            <p>
+                タイムアウト時間は
+                <code>setMaxInactiveInterval()</code>で設定できます。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>ログイン認証</h3>
+
+            <p>
+                認証成功時は、ログインユーザー情報を
+                セッションスコープへ保存します。
+            </p>
+
+            <p>
+                認証が必要なページでは、
+                セッションにログイン情報が存在するか確認します。
+            </p>
+
+            <p>
+                共通の認証確認にはフィルタを利用できます。
+            </p>
+        </div>
+
+        <div class="card">
             <h3>ログアウト</h3>
 
             <p>
@@ -346,12 +560,99 @@
         </div>
 
         <div class="card">
+            <h3>forwardとsendRedirect</h3>
+
+            <p>
+                <code>forward()</code>はサーバー内部で処理を転送します。
+                同じリクエストを引き継ぐことができます。
+            </p>
+
+            <p>
+                <code>sendRedirect()</code>はブラウザへ再アクセスを指示します。
+                新しいリクエストになるため、URLも変化します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>includeの違い</h3>
+
+            <p>
+                <code>&lt;jsp:include&gt;</code>は、
+                リクエスト処理時に対象のJSPを実行して取り込みます。
+            </p>
+
+            <p>
+                <code>&lt;%@ include %&gt;</code>は、
+                JSPの変換時にファイルの内容を取り込みます。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>EL式</h3>
+
+            <p>
+                EL式では、スコープに保存された値や
+                リクエストパラメータなどを簡潔に取得できます。
+            </p>
+
+            <p>
+                例：
+                <code>${sessionScope.loginUser}</code>、
+                <code>${requestScope.message}</code>、
+                <code>${param.id}</code>
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>JSTL</h3>
+
+            <p>
+                条件分岐には<code>&lt;c:if&gt;</code>や
+                <code>&lt;c:choose&gt;</code>、
+                繰り返しには<code>&lt;c:forEach&gt;</code>を使用します。
+            </p>
+
+            <p>
+                JSTLを使用するJSPでは、
+                <code>taglib</code>ディレクティブを記述します。
+            </p>
+        </div>
+
+        <div class="card">
             <h3>ResultSet</h3>
 
             <p>
                 最初は行を指していないため、
                 <code>next()</code>で行を進めてから
                 値を取得します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>executeQueryとexecuteUpdate</h3>
+
+            <p>
+                <code>executeQuery()</code>は主に
+                SELECTで使用し、<code>ResultSet</code>を返します。
+            </p>
+
+            <p>
+                <code>executeUpdate()</code>は主に
+                INSERT、UPDATE、DELETEで使用し、
+                更新された行数を返します。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>DAOパターン</h3>
+
+            <p>
+                DAOはデータベースへのアクセス処理をまとめ、
+                サーブレットやロジックから分離します。
+            </p>
+
+            <p>
+                データの参照、登録、更新、削除などを担当します。
             </p>
         </div>
 
@@ -369,7 +670,7 @@
 
 <section id="quiz">
     <h2 class="section-title">
-        5．確認クイズ
+        5．確認クイズ170問
     </h2>
 
     <div class="quiz-guide card">
@@ -390,6 +691,14 @@
 
             <li>
                 「次の問題」で次へ進みます。
+            </li>
+
+            <li>
+                分野別成績から苦手な分野を確認します。
+            </li>
+
+            <li>
+                間違えた問題だけに絞って復習します。
             </li>
         </ol>
 
@@ -436,45 +745,111 @@
             </span>
         </div>
 
-        <div class="quiz-progress">
+        <div
+            class="quiz-progress"
+            role="progressbar"
+            aria-label="クイズの進捗"
+            aria-valuemin="0"
+            aria-valuemax="170"
+            aria-valuenow="0">
+
             <div
                 id="quizProgressBar"
                 class="quiz-progress-bar">
             </div>
         </div>
 
-        <select id="quizMode">
-            <option value="all">
-                全170問
-            </option>
+        <div class="quiz-filter-grid">
+            <label for="quizMode">
+                問題形式・回答状況
+            </label>
 
-            <option value="fill">
-                穴埋め30問
-            </option>
+            <select id="quizMode">
+                <option value="all">
+                    全170問
+                </option>
 
-            <option value="selection">
-                選択問題100問
-            </option>
+                <option value="fill">
+                    穴埋め30問
+                </option>
 
-            <option value="truefalse">
-                ○×問題30問
-            </option>
+                <option value="selection">
+                    選択問題100問
+                </option>
 
-            <option value="code">
-                コード読解10問
-            </option>
+                <option value="truefalse">
+                    ○×問題30問
+                </option>
 
-            <option value="unanswered">
-                未回答だけ
-            </option>
+                <option value="code">
+                    コード読解10問
+                </option>
 
-            <option value="incorrect">
-                間違えた問題だけ
-            </option>
-        </select>
+                <option value="unanswered">
+                    未回答だけ
+                </option>
+
+                <option value="incorrect">
+                    間違えた問題だけ
+                </option>
+            </select>
+
+            <label for="quizCategory">
+                出題分野
+            </label>
+
+            <select id="quizCategory">
+                <option value="all">
+                    すべての分野
+                </option>
+
+                <option value="session">
+                    セッション管理
+                </option>
+
+                <option value="auth">
+                    ログイン認証・ログアウト
+                </option>
+
+                <option value="lifecycle">
+                    ライフサイクル・リスナー
+                </option>
+
+                <option value="filter">
+                    フィルタ
+                </option>
+
+                <option value="jsp">
+                    JSP・EL・JSTL
+                </option>
+
+                <option value="jdbc">
+                    JDBC・DAO
+                </option>
+            </select>
+        </div>
+
+        <p
+            id="filteredQuestionCount"
+            class="filtered-question-count"
+            aria-live="polite">
+            表示対象：170問
+        </p>
     </div>
 
-    <div id="singleQuizArea"></div>
+    <div
+        id="emptyQuizMessage"
+        class="card empty-message hidden"
+        aria-live="polite">
+
+        条件に一致する問題がありません。
+        問題形式または出題分野を変更してください。
+    </div>
+
+    <div
+        id="singleQuizArea"
+        aria-live="polite">
+    </div>
 
     <div class="quiz-navigation">
         <button
@@ -496,8 +871,17 @@
         <button
             id="overviewButton"
             class="mobile-btn light-btn"
-            type="button">
+            type="button"
+            aria-expanded="false"
+            aria-controls="quizOverview">
             問題一覧を表示
+        </button>
+
+        <button
+            id="showIncorrectButton"
+            class="mobile-btn review-btn"
+            type="button">
+            間違えた問題を復習
         </button>
 
         <button
@@ -514,9 +898,184 @@
     </div>
 </section>
 
+<section id="results">
+    <h2 class="section-title">
+        6．分野別成績
+    </h2>
+
+    <div class="card">
+        <h3>全体の学習状況</h3>
+
+        <div class="overall-result-grid">
+            <div class="result-summary-card">
+                <strong id="answeredCount">0</strong>
+                <span>回答済み</span>
+            </div>
+
+            <div class="result-summary-card correct">
+                <strong id="correctCount">0</strong>
+                <span>正解</span>
+            </div>
+
+            <div class="result-summary-card incorrect">
+                <strong id="incorrectCount">0</strong>
+                <span>不正解</span>
+            </div>
+
+            <div class="result-summary-card accuracy">
+                <strong id="overallAccuracy">－</strong>
+                <span>全体正答率</span>
+            </div>
+        </div>
+    </div>
+
+    <div
+        id="cEvaluationWarning"
+        class="evaluation-warning hidden"
+        role="alert">
+
+        <strong>C評価候補の分野があります。</strong>
+
+        <p>
+            正答率が基準未満の分野を優先して復習してください。
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>6分野の正答率</h3>
+
+        <p>
+            各分野の回答数、正解数、正答率を表示します。
+            未回答の問題が多い場合は、先に全問題へ回答してください。
+        </p>
+
+        <div
+            id="domainScoreList"
+            class="domain-score-list">
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>評価の目安</h3>
+
+        <div class="table-card">
+            <table class="evaluation-table">
+                <thead>
+                    <tr>
+                        <th>表示</th>
+                        <th>正答率の目安</th>
+                        <th>学習方針</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong class="evaluation-a">A</strong>
+                        </td>
+
+                        <td>
+                            80％以上
+                        </td>
+
+                        <td>
+                            よく理解できています。
+                            間違えた問題を中心に確認します。
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong class="evaluation-b">B</strong>
+                        </td>
+
+                        <td>
+                            60％以上80％未満
+                        </td>
+
+                        <td>
+                            解説を確認し、関連問題を解き直します。
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong class="evaluation-c">C</strong>
+                        </td>
+
+                        <td>
+                            60％未満
+                        </td>
+
+                        <td>
+                            重要事項へ戻り、その分野を優先して復習します。
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="small-note">
+            このA・B・C表示は学習用の目安です。
+            実際の評価基準は授業や学校の指示を優先してください。
+        </p>
+    </div>
+</section>
+
+<section id="review">
+    <h2 class="section-title">
+        7．間違えた問題だけ復習
+    </h2>
+
+    <div class="card">
+        <h3>復習の進め方</h3>
+
+        <ol>
+            <li>
+                「間違えた問題を復習」を押します。
+            </li>
+
+            <li>
+                問題文を読み直し、もう一度回答します。
+            </li>
+
+            <li>
+                正解だけでなく、解説と関連メソッドも確認します。
+            </li>
+
+            <li>
+                分野別正答率が低い分野から優先して進めます。
+            </li>
+        </ol>
+
+        <div class="review-action-area">
+            <button
+                id="reviewIncorrectButton"
+                class="mobile-btn review-btn"
+                type="button">
+                間違えた問題を復習する
+            </button>
+
+            <button
+                id="reviewUnansweredButton"
+                class="mobile-btn light-btn"
+                type="button">
+                未回答の問題を解く
+            </button>
+        </div>
+
+        <p
+            id="reviewStatusText"
+            class="review-status-text"
+            aria-live="polite">
+            間違えた問題はまだありません。
+        </p>
+    </div>
+</section>
+
 <section id="supplement">
     <h2 class="section-title">
-        6．授業内容に対する正確な補足
+        8．授業内容に対する正確な補足
     </h2>
 
     <div class="supplement-box">
@@ -564,6 +1123,39 @@
         一方、運用時に変更する初期化パラメータなどは、
         Javaを再コンパイルせず変更できる
         <code>web.xml</code>が適する場合があります。
+    </div>
+
+    <div class="supplement-box">
+        <strong>補足5：JSTLのURI</strong>
+        <br>
+
+        JSTLのライブラリやJakarta EEのバージョンによって、
+        <code>taglib</code>ディレクティブに記述するURIが
+        異なる場合があります。
+
+        テストでは授業で使用した環境と記述を優先してください。
+    </div>
+
+    <div class="supplement-box">
+        <strong>補足6：パスワードの取り扱い</strong>
+        <br>
+
+        実際のWebアプリケーションでは、
+        パスワードを平文のまま保存しません。
+
+        また、ログイン後のセッションへ
+        パスワードそのものを保存することも避けます。
+    </div>
+
+    <div class="supplement-box">
+        <strong>補足7：学習記録の保存場所</strong>
+        <br>
+
+        クイズの回答状況は、
+        ブラウザの<code>localStorage</code>へ保存されます。
+
+        別のブラウザや別の端末には自動的に引き継がれません。
+        ブラウザのデータを削除した場合も記録が消えることがあります。
     </div>
 </section>
 
